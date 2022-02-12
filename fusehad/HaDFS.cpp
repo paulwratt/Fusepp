@@ -60,12 +60,13 @@ int HaDFS::pathfind(const char *path)
   return -1;
 }
 
-static char buf[1024];  // working buffer for reading strings
+
 
 // Read the content or any URL for that matter
 static string readurl(string &url)
 {
   FILE *fp;
+  char buf[1024];  // working buffer for reading strings
     string result, curl="2>/dev/null curl '";
     curl+=url;
   curl+="'";
@@ -84,7 +85,7 @@ int HaDFS::userinit(void)
 {
 
   FILE *fp;
-
+  char buf[1024];  // working buffer for reading strings
   if (!(fp=popen(cmd,"r"))) return 1;  // open pipe
   while (fgets(buf,sizeof(buf),fp))
     {
@@ -93,6 +94,7 @@ int HaDFS::userinit(void)
       if (line.substr(0,7)=="<title>")    // identify line type and process
 	{
 	  topic[topics].title=line.substr(7);
+	  topic[topics].title+=".html";
 
 	}
       else if (line.substr(0,6)=="<link>")
@@ -117,8 +119,8 @@ int HaDFS::getattr(const char *path, struct stat *stbuf, struct fuse_file_info *
 	    stbuf->st_mode = S_IFDIR | 0755;   // our root directory
 	    stbuf->st_nlink = 2;
 	  }
-	else if ((n=pathfind(path+1)))   // find path (skip leading /)
-	  {  
+	else if ((n=pathfind(path+1))>0)   // find path (skip leading /)
+	  {
 	    stbuf->st_mode = S_IFREG | 0444;  // read only
 	    stbuf->st_nlink = 1;   // no links
 	    if (topic[n-1].content.empty())  // if empty, go ahead and fill content cache
@@ -128,7 +130,9 @@ int HaDFS::getattr(const char *path, struct stat *stbuf, struct fuse_file_info *
 	    stbuf->st_size = topic[n-1].content.length();  // now we know the length
 	  }
 	else
+	  {
 	  res = -ENOENT;  // not found
+	  }
 	return res;
 }
 
