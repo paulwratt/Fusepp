@@ -1,4 +1,4 @@
-// Hello filesystem class implementation
+// Hackaday RSS filesystem class implementation
 
 #include "HaDFS.h"
 
