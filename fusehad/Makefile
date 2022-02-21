@@ -2,8 +2,8 @@ PROG=HaD
 OBJDIR=.obj
 CC=g++
 
-CFLAGS = -Wall --std=c++14 `pkg-config fuse3 --cflags` -I..
-LDFLAGS = `pkg-config fuse3 --libs`
+CFLAGS = -Wall --std=c++14 $(shell pkg-config fuse3 --cflags) -I..
+LDFLAGS = $(shell pkg-config fuse3 --libs)
 
 $(shell mkdir -p $(OBJDIR)) 
 
